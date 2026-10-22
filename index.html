@@ -30,6 +30,14 @@
         --ink: #3a2819;
         --acc: #b8582a;
         --glow: #ffd98a;
+        --btn: #2f562f;
+        --btn-ink: #ffffff;
+        --btn-deep: #2f562f;
+        --btn-rgb: 47, 86, 47;
+        --deep-rgb: 47, 86, 47;
+        --sh1: #8fa57f;
+        --sh2: #c9d4b4;
+        --pill-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ffffff' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
       }
       * {
         box-sizing: border-box;
@@ -233,6 +241,107 @@
         font-size: 11px;
         letter-spacing: 0.06em;
       }
+      .gear {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid rgba(241, 217, 168, 0.5);
+        background: rgba(0, 0, 0, 0.28);
+        color: #f1d9a8;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+      .gear:active {
+        transform: scale(0.92);
+      }
+      .gear svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .cfg {
+        position: fixed;
+        inset: 0;
+        z-index: 70;
+        background: rgba(30, 18, 8, 0.6);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .cfg[hidden] {
+        display: none;
+      }
+      .cfgc {
+        width: 100%;
+        max-width: 460px;
+        background: #f6ebd9;
+        border-radius: 22px 22px 0 0;
+        padding: 20px 22px calc(22px + env(safe-area-inset-bottom));
+        color: #3b1d1a;
+        font-family: "Cormorant Garamond", Georgia, serif;
+      }
+      .cfgc h2 {
+        margin: 0 0 14px;
+        font-size: 26px;
+        font-style: italic;
+        font-weight: 600;
+      }
+      .cfgc .cl {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      .cfgc .sws {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 22px;
+      }
+      .cfgc .sw1 {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        border: 0;
+        background: none;
+        padding: 0;
+        font: inherit;
+        font-size: 14px;
+        color: #6b524a;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+      .cfgc .sw1 i {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-style: normal;
+        font-size: 22px;
+        font-weight: 700;
+        box-shadow: 0 2px 6px rgba(60, 40, 20, 0.22);
+      }
+      .cfgc .sw1.on {
+        color: #3b1d1a;
+        font-weight: 700;
+      }
+      .cfgc .sw1.on i {
+        box-shadow:
+          0 0 0 3px #f6ebd9,
+          0 0 0 5px var(--btn-deep);
+      }
       .stat-fav {
         border: 0;
         background: transparent;
@@ -300,8 +409,8 @@
         font-size: 16px;
       }
       .pri {
-        background: #2f562f;
-        color: #fff8ee;
+        background: var(--btn);
+        color: var(--btn-ink);
         font-weight: 600;
       }
       .sec {
@@ -403,7 +512,7 @@
         border-radius: 50%;
         border: 1px solid #cdb592;
         background: #fffaf0;
-        color: #2f562f;
+        color: var(--btn-deep);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -411,9 +520,9 @@
         touch-action: manipulation;
       }
       .upl button.has {
-        background: #2f562f;
-        border-color: #2f562f;
-        color: #fff;
+        background: var(--btn);
+        border-color: var(--btn);
+        color: var(--btn-ink);
       }
       .upl button:active {
         transform: scale(0.92);
@@ -671,7 +780,7 @@
       .sheet {
         display: block;
         overflow: auto;
-        background: linear-gradient(#8fa57f, #c9d4b4 20%, #f3eedd 46%) fixed;
+        background: linear-gradient(var(--sh1), var(--sh2) 20%, #f3eedd 46%) fixed;
       }
       .page {
         width: 100%;
@@ -711,7 +820,7 @@
         border-radius: 50%;
         border: 1px solid #cdb592;
         background: #fffaf0;
-        color: #2f562f;
+        color: var(--btn-deep);
         box-shadow: 0 3px 10px rgba(60, 40, 20, 0.18);
         touch-action: manipulation;
       }
@@ -768,8 +877,8 @@
         border-radius: 5px 2px 2px 5px;
         flex-direction: column;
         gap: 10px;
-        border: 1.5px solid rgba(47, 86, 47, 0.28);
-        color: #2f562f;
+        border: 1.5px solid rgba(var(--deep-rgb), 0.28);
+        color: var(--btn-deep);
         background-color: rgba(255, 250, 240, 0.55);
         box-shadow: 0 8px 16px rgba(60, 40, 20, 0.12);
         background-size: cover;
@@ -824,7 +933,7 @@
       .tt i {
         font-style: normal;
         font-size: 18px;
-        color: #2f562f;
+        color: var(--btn-deep);
       }
       .aux {
         font-size: 19px;
@@ -843,10 +952,8 @@
       .pill {
         appearance: none;
         -webkit-appearance: none;
-        background: #2f562f
-          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='white' fill='none' stroke-width='1.5'/%3E%3C/svg%3E")
-          no-repeat right 14px center;
-        color: #fff;
+        background: var(--btn) var(--pill-arrow) no-repeat right 14px center;
+        color: var(--btn-ink);
         border: 0;
         border-radius: 13px;
         padding: 10px 38px 10px 22px;
@@ -885,13 +992,13 @@
         border: 0;
         border-radius: 30px;
         padding: 17px;
-        background: #2f562f;
-        color: #fff;
+        background: var(--btn);
+        color: var(--btn-ink);
         font:
           700 20px "Cormorant Garamond",
           Georgia,
           serif;
-        box-shadow: 0 8px 18px rgba(47, 86, 47, 0.35);
+        box-shadow: 0 8px 18px rgba(var(--btn-rgb), 0.35);
         margin-top: 4px;
       }
       body {
@@ -984,8 +1091,8 @@
         width: 44px;
         height: 44px;
         padding: 11px;
-        color: #2f562f;
-        background: rgba(47, 86, 47, 0.12);
+        color: var(--btn-deep);
+        background: rgba(var(--deep-rgb), 0.12);
       }
       #slE.has {
         border-color: transparent;
@@ -1060,9 +1167,9 @@
           serif;
       }
       .chips button.on {
-        background: #2f562f;
-        border-color: #2f562f;
-        color: #fff;
+        background: var(--btn);
+        border-color: var(--btn);
+        color: var(--btn-ink);
       }
       .chips button .gx {
         margin-left: 7px;
@@ -1168,9 +1275,9 @@
       }
       .edb #eda {
         flex: 1.6;
-        background: #2f562f;
-        color: #fff;
-        box-shadow: 0 8px 18px rgba(47, 86, 47, 0.35);
+        background: var(--btn);
+        color: var(--btn-ink);
+        box-shadow: 0 8px 18px rgba(var(--btn-rgb), 0.35);
       }
       @media (prefers-reduced-motion: reduce) {
         * {
@@ -1681,7 +1788,23 @@
     </style>
   </head>
   <body>
-    <header><h1>My Library</h1></header>
+    <header>
+      <h1>My Library</h1>
+      <button class="gear" id="gear" aria-label="Ajustes">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </button>
+    </header>
+    <div class="cfg" id="cfg" hidden>
+      <div class="cfgc" role="dialog" aria-label="Ajustes">
+        <h2>Ajustes</h2>
+        <div class="cl">Color de los botones</div>
+        <div class="sws" id="sws"></div>
+        <button class="pri2" id="cfgOk">Listo</button>
+      </div>
+    </div>
     <main id="shelf"></main>
     <footer>
       <div class="stats">
@@ -2123,6 +2246,68 @@
         shelf.addEventListener("contextmenu", (e) => {
           if (e.target.closest("[data-book-id]")) e.preventDefault();
         });
+      })();
+
+      /* ---------- ajustes: color de los botones ---------- */
+      (() => {
+        const THEMES = {
+          verde: { n: "Verde", btn: "#2f562f", ink: "#ffffff", deep: "#2f562f", rgb: "47, 86, 47", d: "47, 86, 47", s1: "#8fa57f", s2: "#c9d4b4" },
+          rosa: { n: "Rosa", btn: "#e8b4bc", ink: "#4a2530", deep: "#a9566a", rgb: "232, 180, 188", d: "169, 86, 106", s1: "#d9a8ae", s2: "#ecd3d2" },
+          lavanda: { n: "Lavanda", btn: "#c6b5e3", ink: "#35294f", deep: "#6f5aa3", rgb: "198, 181, 227", d: "111, 90, 163", s1: "#aa9bc9", s2: "#d9d1e8" },
+          celeste: { n: "Celeste", btn: "#a9cbe3", ink: "#1f3a4d", deep: "#3f7396", rgb: "169, 203, 227", d: "63, 115, 150", s1: "#92b5cc", s2: "#cfe0ea" },
+          durazno: { n: "Durazno", btn: "#f2c4a3", ink: "#4a2a18", deep: "#b0643a", rgb: "242, 196, 163", d: "176, 100, 58", s1: "#dfae8c", s2: "#efd7c3" },
+        };
+        const KEY = "bib.theme";
+        let cur = "verde";
+        try {
+          const t = localStorage.getItem(KEY);
+          if (t && THEMES[t]) cur = t;
+        } catch (e) {}
+        const root = document.documentElement.style;
+        function apply(name) {
+          const t = THEMES[name];
+          if (!t) return;
+          cur = name;
+          root.setProperty("--btn", t.btn);
+          root.setProperty("--btn-ink", t.ink);
+          root.setProperty("--btn-deep", t.deep);
+          root.setProperty("--btn-rgb", t.rgb);
+          root.setProperty("--deep-rgb", t.d);
+          root.setProperty("--sh1", t.s1);
+          root.setProperty("--sh2", t.s2);
+          root.setProperty(
+            "--pill-arrow",
+            `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='${encodeURIComponent(t.ink)}' fill='none' stroke-width='1.5'/%3E%3C/svg%3E")`,
+          );
+          try {
+            localStorage.setItem(KEY, name);
+          } catch (e) {}
+          draw();
+        }
+        function draw() {
+          $("#sws").innerHTML = Object.entries(THEMES)
+            .map(
+              ([k, t]) =>
+                `<button type="button" class="sw1${k === cur ? " on" : ""}" data-t="${k}" aria-label="${t.n}"><i style="background:${t.btn};color:${t.ink}">${k === cur ? "✓" : ""}</i>${t.n}</button>`,
+            )
+            .join("");
+        }
+        const box = $("#cfg"),
+          close = () => (box.hidden = true);
+        $("#gear").onclick = () => {
+          draw();
+          box.hidden = false;
+        };
+        $("#cfgOk").onclick = close;
+        box.addEventListener("click", (e) => {
+          if (e.target === box) close();
+          const b = e.target.closest(".sw1");
+          if (b) apply(b.dataset.t);
+        });
+        addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !box.hidden) close();
+        });
+        apply(cur);
       })();
 
       /* ---------- hoja para agregar libro ---------- */
