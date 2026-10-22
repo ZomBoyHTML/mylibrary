@@ -19,7 +19,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="img/icon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="img/icon.png" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Great+Vibes&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -1785,6 +1785,179 @@
         width: 20px !important;
         height: 20px !important;
       }
+
+      /* ---------- easter egg: dedicatoria ---------- */
+      .egg {
+        background: none;
+        border: 0;
+        padding: 8px 22px;
+        min-width: 44px;
+        min-height: 40px;
+        margin-top: -8px;
+        font: italic 500 24px "Cormorant Garamond", Georgia, serif;
+        line-height: 1;
+        color: rgba(59, 29, 26, 0.16);
+        cursor: pointer;
+        animation: eggIn 1.6s ease both;
+        transition: color 0.4s;
+      }
+      .egg[hidden] {
+        display: none;
+      }
+      .egg:active,
+      .egg:focus-visible {
+        color: rgba(181, 56, 78, 0.55);
+        outline: none;
+      }
+      @keyframes eggIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .ded {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: calc(env(safe-area-inset-top) + 18px) 18px
+          calc(env(safe-area-inset-bottom) + 18px);
+        background: rgba(29, 18, 10, 0.72);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        animation: dedFade 0.45s ease both;
+      }
+      .ded[hidden] {
+        display: none;
+      }
+      .ded-card {
+        position: relative;
+        width: 100%;
+        max-width: 380px;
+        max-height: 100%;
+        overflow-y: auto;
+        box-sizing: border-box;
+        padding: 34px 28px 28px;
+        text-align: center;
+        font-family: "Cormorant Garamond", Georgia, serif;
+        color: #3b1d1a;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.75),
+            rgba(255, 255, 255, 0) 70%
+          ),
+          linear-gradient(#f7eddb, #eedcbc);
+        border-radius: 22px;
+        border: 1px solid rgba(184, 140, 70, 0.55);
+        box-shadow:
+          0 0 0 6px rgba(247, 237, 219, 0.1),
+          0 24px 60px rgba(0, 0, 0, 0.5);
+        animation: dedRise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      .ded-x {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        border: 0;
+        background: none;
+        font-size: 26px;
+        line-height: 1;
+        color: rgba(59, 29, 26, 0.45);
+        cursor: pointer;
+      }
+      .ded-heart {
+        width: 30px;
+        height: 30px;
+        fill: #b5384e;
+        display: block;
+        margin: 0 auto 8px;
+        animation: dedBeat 2.4s ease-in-out infinite;
+      }
+      .ded-card h3 {
+        margin: 0 0 14px;
+        font-size: 27px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+      .ded-line {
+        width: 54px;
+        height: 1px;
+        margin: 0 auto 18px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(184, 140, 70, 0.9),
+          transparent
+        );
+      }
+      .ded-card p {
+        margin: 0 0 14px;
+        font-size: 19.5px;
+        font-weight: 500;
+        font-style: italic;
+        line-height: 1.45;
+      }
+      .ded-sign {
+        margin-top: 20px;
+        font-family: "Great Vibes", "Snell Roundhand", "Brush Script MT",
+          cursive;
+        color: #8f2a40;
+        line-height: 1.05;
+      }
+      .ded-sign span {
+        display: block;
+        font-size: 31px;
+      }
+      .ded-sign b {
+        display: block;
+        margin-top: 2px;
+        font-weight: 400;
+        font-size: 50px;
+      }
+      @keyframes dedFade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes dedRise {
+        from {
+          opacity: 0;
+          transform: translateY(18px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes dedBeat {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.12);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .egg,
+        .ded,
+        .ded-card,
+        .ded-heart {
+          animation: none;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1889,6 +2062,15 @@
         <input type="file" id="fGal" accept="image/*" hidden />
         <div class="sw" id="sw"></div>
         <button class="pri2" id="ok">Agregar a la estantería</button>
+        <button
+          type="button"
+          class="egg"
+          id="egg"
+          hidden
+          aria-label="Una dedicatoria"
+        >
+          ?
+        </button>
         <input
           type="file"
           id="fCover"
@@ -1959,6 +2141,37 @@
     </div>
     <div id="busy" hidden></div>
     <div id="toast"></div>
+
+    <div class="ded" id="ded" hidden>
+      <div class="ded-card" role="dialog" aria-modal="true" aria-labelledby="dedT">
+        <button type="button" class="ded-x" id="dedX" aria-label="Cerrar">
+          ×
+        </button>
+        <svg class="ded-heart" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" />
+        </svg>
+        <h3 id="dedT">Para mi lectora</h3>
+        <div class="ded-line"></div>
+        <p>
+          Esta pequeña biblioteca nació de una idea sencilla: que cada historia
+          que amas tuviera un lugar donde quedarse.
+        </p>
+        <p>
+          La creé solo para ti, querida A, para que ordenes tus libros en
+          tu teléfono y los lleves contigo a todas partes. Para que puedas
+          mostrarlos cuando quieras, recordar cuál es el que te espera pendiente
+          y saber siempre en qué página te quedaste, hasta que vuelvas a abrirlo.
+        </p>
+        <p>
+          Entre todas las historias que existen, mi favorita es la que vivimos
+          juntos. Gracias por ser la inspiración de cada rincón de esta app.
+        </p>
+        <div class="ded-sign">
+          <span>Te amo mucho,</span>
+          <b>A.</b>
+        </div>
+      </div>
+    </div>
 
     <script>
       const $ = (s) => document.querySelector(s),
@@ -2422,6 +2635,42 @@
         $("#sh").scrollTop = 0;
         upd();
       }
+
+      /* ---------- easter egg: dedicatoria ---------- */
+      const ROMANCE_RE =
+        /\b(romanc\w*|romantic(o|a|os|as)?|amor(es)?|love|lovers?|enamor\w*|pasion(es)?|passion|pareja|rom-?com|chick lit|novela rosa|corazon(es)?)\b/;
+      const isRomance = (g) =>
+        ROMANCE_RE.test(
+          String(g)
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, ""),
+        );
+      function updEgg() {
+        const egg = $("#egg");
+        if (!egg || !cur) return;
+        egg.hidden = !(cur.genres || []).some(isRomance);
+      }
+      (() => {
+        const box = $("#ded"),
+          egg = $("#egg");
+        const open = () => {
+          box.hidden = false;
+          $("#dedX").focus({ preventScroll: true });
+        };
+        const close = () => {
+          box.hidden = true;
+          egg.focus({ preventScroll: true });
+        };
+        egg.onclick = open;
+        $("#dedX").onclick = close;
+        box.addEventListener("click", (e) => {
+          if (e.target === box) close();
+        });
+        addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !box.hidden) close();
+        });
+      })();
       function genChips() {
         const all = [
           ...customGenres,
@@ -2433,6 +2682,7 @@
               `<button type="button" data-g="${esc(g)}" class="${cur.genres.includes(g) ? "on" : ""}">${esc(g)}${genreEdit ? ` <span data-x="${esc(g)}" aria-label="Eliminar ${esc(g)}">×</span>` : ""}</button>`,
           )
           .join("");
+        updEgg();
       }
       function addGen() {
         const raw = $("#gi").value;
