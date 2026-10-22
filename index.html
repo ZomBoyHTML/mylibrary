@@ -348,6 +348,14 @@
         grid-template-columns: 1fr 1fr;
         gap: 6px;
       }
+      #ds {
+        height: 58px;
+        min-height: 44px;
+        padding: 8px 11px;
+        font-size: 14px;
+        line-height: 1.35;
+        resize: vertical;
+      }
       .seg {
         display: flex;
         background: #e6d4b8;
@@ -663,7 +671,7 @@
       .sheet {
         display: block;
         overflow: auto;
-        background: linear-gradient(#c99a4b, #e9d3a8 18%, #f6ebd9 42%) fixed;
+        background: linear-gradient(#8fa57f, #c9d4b4 20%, #f3eedd 46%) fixed;
       }
       .page {
         width: 100%;
@@ -691,6 +699,33 @@
         color: #fff;
         width: 40px;
         height: 40px;
+      }
+      .ic2#cancel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        font-size: 0;
+        border-radius: 50%;
+        border: 1px solid #cdb592;
+        background: #fffaf0;
+        color: #2f562f;
+        box-shadow: 0 3px 10px rgba(60, 40, 20, 0.18);
+        touch-action: manipulation;
+      }
+      .ic2#cancel:active {
+        transform: scale(0.92);
+      }
+      .ic2#cancel svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
       }
       .tri {
         width: 100%;
@@ -733,8 +768,10 @@
         border-radius: 5px 2px 2px 5px;
         flex-direction: column;
         gap: 10px;
-        border: 1.5px dashed #b07a6a;
-        color: #a0665a;
+        border: 1.5px solid rgba(47, 86, 47, 0.28);
+        color: #2f562f;
+        background-color: rgba(255, 250, 240, 0.55);
+        box-shadow: 0 8px 16px rgba(60, 40, 20, 0.12);
         background-size: cover;
         background-position: center;
       }
@@ -742,6 +779,8 @@
         font-size: 13px;
         font-weight: 700;
         text-align: center;
+        letter-spacing: 0.3px;
+        opacity: 0.8;
       }
       .rm {
         position: absolute;
@@ -945,8 +984,14 @@
         width: 44px;
         height: 44px;
         padding: 11px;
-        color: #a0665a;
-        background: rgba(160, 102, 90, 0.14);
+        color: #2f562f;
+        background: rgba(47, 86, 47, 0.12);
+      }
+      #slE.has {
+        border-color: transparent;
+        box-shadow:
+          0 8px 16px rgba(60, 30, 10, 0.35),
+          inset 3px 0 3px rgba(0, 0, 0, 0.25);
       }
       #slE.has .cam {
         position: absolute;
@@ -1661,7 +1706,7 @@
     <div class="sheet" id="sh" hidden>
       <div class="page">
         <div class="top">
-          <button class="ic2" id="cancel" aria-label="Volver">‹</button>
+          <button class="ic2" id="cancel" aria-label="Volver"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg></button>
         </div>
         <div class="tri">
           <div class="slS" id="slS"></div>
@@ -1689,7 +1734,7 @@
               autocomplete="off"
             />
           </div>
-          <textarea id="ds" rows="3" placeholder="Descripción"></textarea>
+          <textarea id="ds" rows="2" placeholder="Descripción"></textarea>
           <div class="genre-tools">
             <button type="button" id="genreManage">✎ Editar géneros</button>
           </div>
@@ -2106,9 +2151,6 @@
         "Historia",
         "Biografía",
         "Poesía",
-        "Ensayo",
-        "Autoayuda",
-        "Infantil",
       ];
       let customGenres = [];
       try {
@@ -2125,6 +2167,16 @@
           localStorage.setItem("bib.genres", JSON.stringify(customGenres));
         } catch (e) {}
       };
+      // una sola vez: quita de la lista guardada los géneros eliminados
+      try {
+        if (!localStorage.getItem("bib.genres.v2")) {
+          customGenres = customGenres.filter(
+            (g) => !["Ensayo", "Autoayuda", "Infantil"].includes(g),
+          );
+          saveGenres();
+          localStorage.setItem("bib.genres.v2", "1");
+        }
+      } catch (e) {}
 
       const CAM =
         '<button type="button" class="cam" aria-label="Tomar foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg></button>';
@@ -2312,7 +2364,6 @@
         cv.innerHTML = (cur.cover ? rm("cover") : "") + CAM;
         const ee = $("#slE");
         ee.style.backgroundImage = cur.back ? `url("${cur.back}")` : "";
-        ee.style.borderStyle = cur.back ? "solid" : "dashed";
         ee.classList.toggle("has", !!cur.back);
         ee.innerHTML =
           (cur.back ? rm("back") : "") +
