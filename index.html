@@ -64,7 +64,7 @@
           ),
           var(--knit);
         padding: calc(env(safe-area-inset-top) + 8px) 0
-          calc(110px + env(safe-area-inset-bottom));
+          var(--foot-pad, calc(110px + env(safe-area-inset-bottom)));
       }
       header {
         display: flex;
@@ -98,7 +98,8 @@
         align-items: flex-end;
         gap: 2px;
         padding: 0 14px;
-        min-height: 132px;
+        min-height: var(--row-h, 132px);
+        height: var(--row-h, auto);
       }
       .board {
         height: 13px;
@@ -1843,7 +1844,10 @@
         max-height: 100%;
         overflow-y: auto;
         box-sizing: border-box;
-        padding: 34px 28px 28px;
+        /* todo el contenido se escala con el alto y ancho de la pantalla */
+        font-size: clamp(11px, min(2.25vh, 4.8vw), 19.5px);
+        font-size: clamp(11px, min(2.25dvh, 4.8vw), 19.5px);
+        padding: 1.75em 1.45em 1.45em;
         text-align: center;
         font-family: "Cormorant Garamond", Georgia, serif;
         color: #3b1d1a;
@@ -1854,7 +1858,7 @@
             rgba(255, 255, 255, 0) 70%
           ),
           linear-gradient(#f7eddb, #eedcbc);
-        border-radius: 22px;
+        border-radius: 1.1em;
         border: 1px solid rgba(184, 140, 70, 0.55);
         box-shadow:
           0 0 0 6px rgba(247, 237, 219, 0.1),
@@ -1863,35 +1867,37 @@
       }
       .ded-x {
         position: absolute;
-        top: 8px;
-        right: 10px;
-        width: 40px;
-        height: 40px;
+        top: 0.3em;
+        right: 0.4em;
+        width: 1.9em;
+        height: 1.9em;
+        min-width: 34px;
+        min-height: 34px;
         border: 0;
         background: none;
-        font-size: 26px;
+        font-size: 1.3em;
         line-height: 1;
         color: rgba(59, 29, 26, 0.45);
         cursor: pointer;
       }
       .ded-heart {
-        width: 30px;
-        height: 30px;
+        width: 1.55em;
+        height: 1.55em;
         fill: #b5384e;
         display: block;
-        margin: 0 auto 8px;
+        margin: 0 auto 0.4em;
         animation: dedBeat 2.4s ease-in-out infinite;
       }
       .ded-card h3 {
-        margin: 0 0 14px;
-        font-size: 27px;
+        margin: 0 0 0.5em;
+        font-size: 1.38em;
         font-weight: 700;
         letter-spacing: 0.01em;
       }
       .ded-line {
-        width: 54px;
+        width: 2.8em;
         height: 1px;
-        margin: 0 auto 18px;
+        margin: 0 auto 0.9em;
         background: linear-gradient(
           90deg,
           transparent,
@@ -1900,14 +1906,14 @@
         );
       }
       .ded-card p {
-        margin: 0 0 14px;
-        font-size: 19.5px;
+        margin: 0 0 0.7em;
+        font-size: 1em;
         font-weight: 500;
         font-style: italic;
-        line-height: 1.45;
+        line-height: 1.4;
       }
       .ded-sign {
-        margin-top: 20px;
+        margin-top: 1em;
         font-family: "Great Vibes", "Snell Roundhand", "Brush Script MT",
           cursive;
         color: #8f2a40;
@@ -1915,13 +1921,13 @@
       }
       .ded-sign span {
         display: block;
-        font-size: 31px;
+        font-size: 1.6em;
       }
       .ded-sign b {
         display: block;
-        margin-top: 2px;
+        margin-top: 0.05em;
         font-weight: 400;
-        font-size: 50px;
+        font-size: 2.55em;
       }
       @keyframes dedFade {
         from {
@@ -1957,6 +1963,23 @@
         .ded-heart {
           animation: none;
         }
+      }
+
+      /* sin barras de desplazamiento visibles */
+      html,
+      body,
+      * {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      *::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+        display: none;
+      }
+      body {
+        min-height: 100vh;
+        min-height: 100dvh;
       }
     </style>
   </head>
@@ -2241,6 +2264,7 @@
         return d;
       }
       let suppressClick = false;
+      let lastView = [0, 0];
       function render() {
         const box = $("#shelf");
         box.innerHTML = "";
@@ -2256,7 +2280,27 @@
           rows[rows.length - 1].push(b);
           w += bw;
         });
-        while (rows.length < 4) rows.push([]);
+        /* la repisa se ajusta al alto de la pantalla: sin scroll si caben */
+        const ROW = 132,
+          GAP = 13 + 26,
+          foot = $("footer").offsetHeight,
+          top = box.getBoundingClientRect().top + scrollY,
+          fit = Math.max(
+            1,
+            Math.floor((innerHeight - top - foot + 26) / (ROW + GAP)),
+          ),
+          pad = Math.max(0, foot - 26);
+        while (rows.length < fit) rows.push([]);
+        document.documentElement.style.setProperty("--foot-pad", pad + "px");
+        const extra =
+          rows.length === fit
+            ? Math.max(
+                0,
+                Math.floor((innerHeight - top - pad) / fit) - GAP - ROW,
+              )
+            : 0;
+        box.style.setProperty("--row-h", ROW + extra + "px");
+        lastView = [innerWidth, innerHeight];
         rows.forEach((r) => {
           const row = document.createElement("div");
           row.className = "row";
@@ -2635,6 +2679,26 @@
         $("#sh").scrollTop = 0;
         upd();
       }
+
+      /* reajusta la repisa al girar o cambiar el tamaño de la ventana */
+      (() => {
+        let t;
+        addEventListener("resize", () => {
+          clearTimeout(t);
+          t = setTimeout(() => {
+            const busy =
+              document.body.classList.contains("reordering") ||
+              !$("#vw").hidden ||
+              !$("#sh").hidden;
+            if (
+              !busy &&
+              (innerWidth !== lastView[0] ||
+                Math.abs(innerHeight - lastView[1]) > 150)
+            )
+              render();
+          }, 250);
+        });
+      })();
 
       /* ---------- easter egg: dedicatoria ---------- */
       const ROMANCE_RE =
