@@ -1184,6 +1184,23 @@
         font-size: 20px;
       }
 
+      /* X de géneros al editar: sin círculo, misma posición */
+      .chips button [data-x] {
+        border: 0;
+        background: none;
+        box-shadow: none;
+        text-shadow: none;
+        border-radius: 0;
+        color: inherit;
+        font-weight: 700;
+      }
+      .chips button [data-x]:active {
+        transform: scale(0.85);
+        filter: none;
+        box-shadow: none;
+        opacity: 0.6;
+      }
+
       /* Favoritos como icono de corazon, integrado en la biblioteca */
       .stats {
         gap: 22px;
