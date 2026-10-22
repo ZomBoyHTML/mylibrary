@@ -369,6 +369,56 @@
       #sw[hidden] {
         display: none;
       }
+      .upl {
+        width: 100%;
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        margin-top: -4px;
+      }
+      .upl .u {
+        display: flex;
+        justify-content: center;
+      }
+      .upl .u.s {
+        flex: none;
+        width: 32px;
+      }
+      .upl .u.c {
+        flex: 0 1 122px;
+        min-width: 0;
+      }
+      .upl button {
+        flex: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid #cdb592;
+        background: #fffaf0;
+        color: #7a2430;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        touch-action: manipulation;
+      }
+      .upl button.has {
+        background: #7a2430;
+        border-color: #7a2430;
+        color: #fff;
+      }
+      .upl button:active {
+        transform: scale(0.92);
+      }
+      .upl svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
       .sw {
         display: flex;
         gap: 10px;
@@ -1530,6 +1580,39 @@
         box-shadow: 0 0 0 2px rgba(155, 118, 80, 0.15);
       }
 
+      .notes {
+        margin: 14px 0 4px;
+      }
+      .notes label {
+        display: block;
+        margin-bottom: 6px;
+        color: #6b4a2e;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .notes textarea {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 96px;
+        padding: 10px 12px;
+        border: 1px solid #cdb28d;
+        border-radius: 12px;
+        background: #fff8ec;
+        color: #3b2110;
+        font: inherit;
+        font-size: 16px;
+        line-height: 1.5;
+        resize: vertical;
+        outline: none;
+      }
+      .notes textarea::placeholder {
+        color: #a89077;
+      }
+      .notes textarea:focus {
+        border-color: #9b7650;
+        box-shadow: 0 0 0 2px rgba(155, 118, 80, 0.15);
+      }
+
       #more {
         display: flex;
         align-items: center;
@@ -1585,6 +1668,11 @@
           <div class="slC" id="slC"></div>
           <div class="slE" id="slE"></div>
         </div>
+        <div class="upl" id="upl">
+          <div class="u s"><button type="button" data-k="spine" aria-label="Subir imagen del lomo desde el dispositivo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V5m0 0L8 9m4-4 4 4M5 15v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></svg></button></div>
+          <div class="u c"><button type="button" data-k="cover" aria-label="Subir imagen de la portada desde el dispositivo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V5m0 0L8 9m4-4 4 4M5 15v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></svg></button></div>
+          <div class="u c"><button type="button" data-k="back" aria-label="Subir imagen de la contraportada desde el dispositivo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V5m0 0L8 9m4-4 4 4M5 15v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></svg></button></div>
+        </div>
         <h2 class="tt" id="tt"><span id="tx"></span><i>⌄</i></h2>
         <div class="aux" id="aux"></div>
         <div class="srch" id="srch">
@@ -1630,6 +1718,7 @@
           ><button data-v="cover">Portada</button
           ><button data-v="back">Contraportada</button>
         </div>
+        <input type="file" id="fGal" accept="image/*" hidden />
         <div class="sw" id="sw"></div>
         <button class="pri2" id="ok">Agregar a la estantería</button>
         <input
@@ -1806,6 +1895,15 @@
           bd.className = "board";
           box.append(bd);
         });
+        if (typeof V !== "undefined" && V) {
+          const ne = document.querySelector(
+            '[data-book-id="' + V.id + '"]',
+          );
+          if (ne) {
+            ne.style.visibility = "hidden";
+            V.el = ne;
+          }
+        }
         $("#n1").textContent = books.length;
         $("#n2").textContent = books.filter((b) => b.read).length;
         const fb = $("#favToggle");
@@ -2193,6 +2291,9 @@
           .querySelectorAll("#sMode button")
           .forEach((x) => x.classList.toggle("on", x.dataset.v === cur.mode));
         document
+          .querySelectorAll("#upl button")
+          .forEach((x) => x.classList.toggle("has", !!cur[x.dataset.k]));
+        document
           .querySelectorAll("#sw i")
           .forEach((x) => x.classList.toggle("on", x.dataset.v === cur.color));
         $("#tx").textContent = b.title;
@@ -2264,7 +2365,7 @@
         addGen();
         const b = curBook(),
           i = books.findIndex((x) => x.id === b.id);
-        if (i >= 0) books[i] = b;
+        if (i >= 0) books[i] = { ...books[i], ...b };
         else books.push(b);
         persist();
         $("#sh").hidden = true;
@@ -2281,20 +2382,30 @@
           spine: "Ajusta el lomo",
           back: "Ajusta la contraportada",
         };
+      const pickFile = async (k, e) => {
+        const f = e.target.files[0];
+        e.target.value = "";
+        if (!f) return;
+        busy("Abriendo la foto…");
+        try {
+          await openEd(k, await fileURL(f, 1600));
+        } catch (er) {
+          toast("No pude abrir la imagen");
+        }
+        busy();
+      };
       Object.entries(FI).forEach(([k, sel]) => {
-        $(sel).onchange = async (e) => {
-          const f = e.target.files[0];
-          e.target.value = "";
-          if (!f) return;
-          busy("Abriendo la foto…");
-          try {
-            await openEd(k, await fileURL(f, 1600));
-          } catch (er) {
-            toast("No pude abrir la imagen");
-          }
-          busy();
-        };
+        $(sel).onchange = (e) => pickFile(k, e);
       });
+      // subir desde la galería / archivos del dispositivo (sin abrir la cámara)
+      let galK = "cover";
+      $("#upl").onclick = (e) => {
+        const b = e.target.closest("button[data-k]");
+        if (!b) return;
+        galK = b.dataset.k;
+        $("#fGal").click();
+      };
+      $("#fGal").onchange = (e) => pickFile(galK, e);
       function openEd(k, url) {
         return new Promise((ok, no) => {
           const im = new Image();
@@ -2430,7 +2541,10 @@
       };
       $("#edx").onclick = closeE;
       $("#edr").onclick = () => {
-        if (E) $(FI[E.k]).click();
+        if (E) {
+          galK = E.k;
+          $("#fGal").click();
+        }
       };
       $("#eda").onclick = () => {
         if (!E) return;
@@ -2462,9 +2576,10 @@
       addEventListener("resize", layoutE);
 
       /* ---------- visor 3D ---------- */
+      let notesFlush = null;
       let V = null,
         raf = 0;
-      function openV(id, el) {
+      function openV(id, el, again) {
         const b = books.find((x) => x.id === id);
         if (!b) return;
         const W = 150,
@@ -2509,6 +2624,7 @@
           F("pgv", W, D, `rotateX(-90deg) translateZ(${H / 2}px)`, "");
         $("#info").innerHTML =
           `<div class="book-title-row"><h2>${esc(b.title)}</h2><button type="button" id="cycleStatus" class="status-pill status-${(b.status || (b.read ? "leído" : "por leer")).toLowerCase().replace(/\s+/g, "-")}" aria-label="Cambiar estado de lectura">${esc(b.status || (b.read ? "leído" : "por leer"))}</button><button id="favBook" class="heart-book ${b.favorite ? "is-fav" : ""}" aria-label="${b.favorite ? "Quitar de favoritos" : "Agregar a favoritos"}" aria-pressed="${String(!!b.favorite)}"><svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div><div class="meta">${esc(b.author || "Autor desconocido")}${b.pages ? " · " + b.pages + " páginas" : ""}${b.rating ? " · " + "★".repeat(b.rating) : ""}</div>${(b.genres || []).length ? '<div class="gens">' + b.genres.map((g) => "<span>" + esc(g) + "</span>").join("") + "</div>" : ""}${(b.status || (b.read ? "leído" : "por leer")) === "leyendo" ? '<div class="last-page-row"><label for="lastPageInput">Última página leída:</label><input id="lastPageInput" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*" value="' + Math.max(0, parseInt(b.lastPage, 10) || 0) + '" aria-label="Última página leída"></div>' : ""}<p>${esc(b.desc || "Este libro no tiene descripción disponible.")}</p>
+ <div class="notes"><label for="bookNotes">Notas</label><textarea id="bookNotes" rows="4" placeholder="Escribe tus notas sobre este libro…">${esc(b.notes || "")}</textarea></div>
  <div class="acts"><button id="del">Quitar</button></div>`;
         $("#cycleStatus").onclick = () => {
           const states = ["por leer", "leyendo", "leído"];
@@ -2519,6 +2635,7 @@
           openV(
             b.id,
             V?.el || document.querySelector('[data-book-id="' + b.id + '"]'),
+            true,
           );
         };
         const lastPageInput = $("#lastPageInput");
@@ -2528,6 +2645,24 @@
             b.lastPage = Math.max(0, parseInt(lastPageInput.value, 10) || 0);
             persist();
           });
+        }
+        const nt = $("#bookNotes");
+        if (nt) {
+          let tm = 0;
+          const save = () => {
+            clearTimeout(tm);
+            tm = 0;
+            if ((b.notes || "") !== nt.value) {
+              b.notes = nt.value;
+              persist();
+            }
+          };
+          nt.addEventListener("input", () => {
+            clearTimeout(tm);
+            tm = setTimeout(save, 400);
+          });
+          nt.addEventListener("blur", save);
+          notesFlush = save;
         }
         $("#favBook").onclick = () => {
           b.favorite = !b.favorite;
@@ -2552,6 +2687,10 @@
           closeV();
           openSheet(b);
         };
+        if (again && V) {
+          V.el = el;
+          return;
+        }
         $("#vw").hidden = false;
         const fl = $("#fl"),
           a = el.getBoundingClientRect(),
@@ -2566,8 +2705,9 @@
         el.style.visibility = "hidden";
         V = {
           el,
+          id: b.id,
           rx: -8,
-          ry: b.mode === "cover" ? 0 : b.mode === "back" ? 180 : -90,
+          ry: b.mode === "cover" ? 0 : b.mode === "back" ? 180 : 90,
           drag: null,
           t0: performance.now(),
         };
@@ -2592,20 +2732,37 @@
       }
       function closeV() {
         if (!V) return;
+        if (notesFlush) notesFlush();
+        notesFlush = null;
         const current = V,
-          el = current.el,
           inn = $("#in"),
           fl = $("#fl"),
           bk = $("#bk");
         // Detiene el giro flotante y anima el libro girando hacia la orientacion de su estante.
         cancelAnimationFrame(raf);
         V = null;
+        let el = current.el;
+        if (!el || !el.isConnected)
+          el = document.querySelector('[data-book-id="' + current.id + '"]');
+        if (!el) {
+          // el libro ya no está en el estante (p. ej. se quitó): solo se desvanece
+          inn.style.transition = "opacity .3s";
+          inn.style.opacity = "0";
+          setTimeout(() => {
+            $("#vw").hidden = true;
+            inn.style.transition = "none";
+            inn.style.transform = "none";
+            inn.style.opacity = "1";
+          }, 310);
+          return;
+        }
         const a = el.getBoundingClientRect(),
           z = fl.getBoundingClientRect();
         const sc = Math.max(0.08, a.height / z.height),
           dx = a.left + a.width / 2 - (z.left + z.width / 2),
           dy = a.top + a.height / 2 - (z.top + z.height / 2);
-        const targetY = el.classList.contains("cv") ? 0 : 90;
+        const baseY = el.classList.contains("cv") ? 0 : 90,
+          targetY = baseY + 360 * Math.round((current.ry - baseY) / 360);
         bk.style.transition = "transform .38s cubic-bezier(.4,0,.7,.2)";
         bk.style.transform = `translateY(0) rotateX(0deg) rotateY(${targetY}deg)`;
         inn.style.transition = "none";
