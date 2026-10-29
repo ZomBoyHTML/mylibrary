@@ -1981,6 +1981,22 @@
         min-height: 100vh;
         min-height: 100dvh;
       }
+
+      /* inspección a pantalla completa */
+      #fs{position:absolute;top:calc(env(safe-area-inset-top) + 10px);right:104px;z-index:3;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(232,213,186,.5);color:#e8d5ba;padding:0;opacity:.88}
+      #fs:active{opacity:1;transform:scale(.94)}
+      #fs svg{width:19px;height:19px;display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+      #fs .i-out{display:none}
+      #vw.fs #fs{right:12px}
+      #vw.fs #fs .i-in{display:none}
+      #vw.fs #fs .i-out{display:block}
+      #vw.fs #x,#vw.fs #more{display:none!important}
+      #vw #stg{transition:height .35s ease}
+      #vw.fs #stg{height:100%;min-height:0}
+      #vw #info{transition:opacity .25s}
+      #vw.fs #info{opacity:0;pointer-events:none}
+      #fsHint{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 24px);text-align:center;font-size:13px;color:#e8d5ba;opacity:0;pointer-events:none;transition:opacity .4s;z-index:2}
+      #fsHint.on{opacity:.85}
     </style>
   </head>
   <body>
@@ -2154,6 +2170,11 @@
           <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </button>
+      <button id="fs" type="button" aria-label="Inspeccionar en pantalla completa">
+        <svg class="i-in" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+        <svg class="i-out" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /></svg>
+      </button>
+      <div id="fsHint">Gira con un dedo · pellizca para hacer zoom · doble toque para acercar</div>
       <div id="stg">
         <div id="fl">
           <div id="in"><div id="bk"></div></div>
@@ -3259,6 +3280,13 @@
           rx: -8,
           ry: b.mode === "cover" ? 0 : b.mode === "back" ? 180 : 90,
           drag: null,
+          ptrs: new Map(),
+          fs: false,
+          z: 1,
+          tx: 0,
+          ty: 0,
+          bk: 1,
+          back: false,
           t0: performance.now(),
         };
         inn.getBoundingClientRect();
@@ -3271,17 +3299,23 @@
         const loop = (t) => {
           if (!V) return;
           const el = t - V.t0;
-          if (!V.drag) {
+          if (!V.drag && !V.fs) {
             if (el < 1000) V.ry += (28 - V.ry) * 0.07;
             else V.ry += 0.35;
+            if (V.back) {
+              V.rx += (-8 - V.rx) * 0.1;
+              if (Math.abs(V.rx + 8) < 0.2) V.back = false;
+            }
           }
-          bk.style.transform = `translateY(${Math.sin(t / 650) * 8}px) rotateX(${V.rx}deg) rotateY(${V.ry}deg)`;
+          V.bk += ((V.fs ? 0 : 1) - V.bk) * 0.12;
+          bk.style.transform = `translateY(${Math.sin(t / 650) * 8 * V.bk}px) rotateX(${V.rx}deg) rotateY(${V.ry}deg)`;
           raf = requestAnimationFrame(loop);
         };
         raf = requestAnimationFrame(loop);
       }
       function closeV() {
         if (!V) return;
+        if (V.fs) setFs(false, true);
         if (notesFlush) notesFlush();
         notesFlush = null;
         const current = V,
@@ -3337,25 +3371,113 @@
         favGlow = !favGlow;
         render();
       };
-      const st = $("#stg");
+      const st = $("#stg"),
+        vw = $("#vw"),
+        fsB = $("#fs"),
+        fsHint = $("#fsHint");
+      let hintTm = 0,
+        lastTap = 0,
+        pin = null;
+      const S0 = () => Math.min((innerWidth * 0.8) / 150, (innerHeight * 0.7) / 225, 3.4);
+      function clampPan() {
+        const k = Math.min(1, V.z - 1),
+          lx = (150 * S0() * V.z * k) / 2,
+          ly = (225 * S0() * V.z * k) / 2;
+        V.tx = Math.max(-lx, Math.min(lx, V.tx));
+        V.ty = Math.max(-ly, Math.min(ly, V.ty));
+      }
+      function applyZ(anim) {
+        const fl = $("#fl");
+        fl.style.transition = anim ? "transform .35s ease" : "none";
+        fl.style.transform = V && V.fs ? `translate(${V.tx}px,${V.ty}px) scale(${S0() * V.z})` : "";
+      }
+      function setFs(on, instant) {
+        if (!V) return;
+        V.fs = on;
+        V.z = 1;
+        V.tx = V.ty = 0;
+        V.drag = null;
+        V.ptrs.clear();
+        pin = null;
+        if (!on) V.back = true;
+        if (instant) st.style.transition = "none";
+        vw.classList.toggle("fs", on);
+        applyZ(!instant);
+        if (instant) {
+          st.getBoundingClientRect();
+          st.style.transition = "";
+        }
+        clearTimeout(hintTm);
+        fsHint.classList.toggle("on", on);
+        if (on) hintTm = setTimeout(() => fsHint.classList.remove("on"), 3200);
+        fsB.setAttribute("aria-label", on ? "Salir de pantalla completa" : "Inspeccionar en pantalla completa");
+      }
+      fsB.onclick = () => V && setFs(!V.fs);
+      addEventListener("resize", () => V && V.fs && applyZ(false));
+      const mid = (a, b) => {
+        const r = st.getBoundingClientRect();
+        return [(a[0] + b[0]) / 2 - (r.left + r.width / 2), (a[1] + b[1]) / 2 - (r.top + r.height / 2)];
+      };
       st.onpointerdown = (e) => {
-        if (V) {
+        if (!V) return;
+        st.setPointerCapture(e.pointerId);
+        V.ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+        if (V.ptrs.size === 1) {
           V.drag = [e.clientX, e.clientY];
-          st.setPointerCapture(e.pointerId);
+          if (V.fs) {
+            const n = performance.now();
+            if (n - lastTap < 300) {
+              V.z = V.z > 1.2 ? 1 : 2.5;
+              if (V.z === 1) V.tx = V.ty = 0;
+              clampPan();
+              applyZ(true);
+            }
+            lastTap = n;
+          }
+        } else if (V.fs && V.ptrs.size === 2) {
+          V.drag = null;
+          const [a, b] = [...V.ptrs.values()];
+          pin = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, z: V.z, tx: V.tx, ty: V.ty, c: mid(a, b) };
         }
       };
       st.onpointermove = (e) => {
-        if (!V || !V.drag) return;
+        if (!V || !V.ptrs.has(e.pointerId)) return;
+        V.ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+        if (V.ptrs.size > 1) {
+          if (!V.fs || !pin || V.ptrs.size !== 2) return;
+          const [a, b] = [...V.ptrs.values()],
+            c = mid(a, b);
+          V.z = Math.max(1, Math.min(8, (pin.z * Math.hypot(a[0] - b[0], a[1] - b[1])) / pin.d));
+          const k = V.z / pin.z;
+          V.tx = c[0] - (pin.c[0] - pin.tx) * k;
+          V.ty = c[1] - (pin.c[1] - pin.ty) * k;
+          clampPan();
+          applyZ(false);
+          return;
+        }
+        if (!V.drag) return;
         V.ry += (e.clientX - V.drag[0]) * 0.6;
-        V.rx = Math.max(
-          -45,
-          Math.min(45, V.rx - (e.clientY - V.drag[1]) * 0.4),
-        );
+        V.rx = Math.max(-45, Math.min(45, V.rx - (e.clientY - V.drag[1]) * 0.4));
         V.drag = [e.clientX, e.clientY];
       };
-      st.onpointerup = st.onpointercancel = () => {
-        if (V) V.drag = null;
+      st.onpointerup = st.onpointercancel = (e) => {
+        if (!V) return;
+        V.ptrs.delete(e.pointerId);
+        pin = null;
+        const r = [...V.ptrs.values()];
+        V.drag = r.length === 1 ? r[0].slice() : null;
       };
+      st.addEventListener(
+        "wheel",
+        (e) => {
+          if (!V || !V.fs) return;
+          e.preventDefault();
+          V.z = Math.max(1, Math.min(8, V.z * Math.exp(-e.deltaY * 0.002)));
+          clampPan();
+          applyZ(false);
+        },
+        { passive: false },
+      );
       render();
     </script>
   </body>
