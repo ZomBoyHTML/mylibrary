@@ -1997,7 +1997,7 @@
       #vw.fs #info{opacity:0;pointer-events:none}
       #fsHint{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 24px);text-align:center;font-size:13px;color:#e8d5ba;opacity:0;pointer-events:none;transition:opacity .4s;z-index:2}
       #fsHint.on{opacity:.85}
-      .f3.sp3 img{object-fit:fill}
+      .f3.sp3 img{position:absolute;top:0;left:50%;width:auto;height:100%;max-width:none;transform:translateX(-50%)}
     </style>
   </head>
   <body>
@@ -2280,7 +2280,7 @@
           d.className = "sp";
           d.style.cssText = `--w:${b.th || 26}px;--h:${b.h || 120}px;--c:${b.color}`;
           if (b.spineImg)
-            d.style.background = `url("${b.spineImg}") center/100% 100% no-repeat, var(--c)`;
+            d.style.background = `url("${b.spineImg}") center/auto 100% no-repeat, var(--c)`;
           else d.textContent = b.title;
         }
         return d;
@@ -3156,7 +3156,7 @@
         if (!b) return;
         const W = 150,
           H = 225,
-          D = b.spineImg ? (H * 140) / 800 : Math.max(22, Math.min(52, (b.pages || 250) / 9)),
+          D = Math.max(22, Math.min(52, (b.pages || 250) / 9)),
           col = b.color;
         const F = (cls, w, h, tf, st, inner) =>
           `<div class="f3 ${cls}" style="width:${w}px;height:${h}px;margin:${-h / 2}px 0 0 ${-w / 2}px;transform:${tf};${st}">${inner || ""}</div>`;
